@@ -1,0 +1,19 @@
+/**
+ * @package Netflix_Buttons
+ * @version 1.0
+ */
+div.netflix {
+	/* Container Style Here */
+}
+.nflxBtn a img {
+	background: none;
+	border: none;
+	display: inline;
+	margin: 0;
+	padding: 0;
+	box-shadow: none;
+}
+.apiSmallNoBox,
+.apiLargeNoBox {
+	height: 20px;
+}

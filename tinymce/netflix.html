@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Add Netflix Movie</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script type="text/javascript" src="/wp-includes/js/tinymce/tiny_mce_popup.js"></script>
+<script type="text/javascript">
+var NetflixDialog = {
+	local_ed: 'ed',
+	init: function(ed){
+		NetflixDialog.local_ed = ed;
+		tinyMCEPopup.resizeToInnerSize();
+	},
+	lookup: function lookupMovie(){
+		var title = jQuery('#titleField').val();
+		jQuery('#container').text('Loading...');
+		jQuery.get('get_netflix_titles.php', { 'title': title }, function(data){
+			jQuery('#container').empty();
+			jQuery.each(data, function(i, movie){
+				jQuery('#container').append(
+					jQuery('<a></a>')
+						.attr('href', 'javascript:NetflixDialog.pick('+movie.id+')')
+						.attr('id', movie.id)
+						.text(movie.title)
+				).append('<br>');
+				console.log(movie.title);
+			});
+			console.log(data);
+		}, 'json');
+	},
+	pick: function pickMovie(id){
+		jQuery('#titleField').val(jQuery('#'+id).text());
+		jQuery('#container').html('<img src="http://cdn-7.nflximg.com/us/boxshots/large/'+id+'.jpg" alt="'+jQuery('#'+id).text()+'">');
+		jQuery('#movieId').val(id);
+	},
+	insert: function insertNetflixButton(ed){
+		var movieId = jQuery('#movieId').val();
+		var img = false;
+		if (jQuery('#image:checked').val() !== undefined) 
+			img = true;
+		if(movieId){
+			tinyMCEPopup.execCommand('mceInsertContent', false, '[netflix:'+movieId+':img:'+img+':end]');		
+			tinyMCEPopup.close();
+		}
+	}
+};
+console.log(tinymce.DOM.get('add_video').href);
+tinyMCEPopup.onInit.add(NetflixDialog.init, NetflixDialog);
+</script>
+<style>
+#container {
+	border: 1px solid #aaa;
+	margin: 15px 0;
+	padding: 5px;
+}
+.updateButton {
+	float: right;
+}
+.button {
+	bottom: 8px;
+	position: absolute;
+	right: 8px;
+}
+</style>
+</head>
+
+<body>
+<button onclick="javascript:NetflixDialog.lookup()" class="updateButton">Search</button>
+<input type="text" value="" id="titleField"><br>
+<input type="checkbox" checked id="image"> Show Image?<br>
+<div id="container">Enter a Movie Title and Press Search</div>
+<input type="hidden" id="movieId" value="0">
+<button onclick="javascript:NetflixDialog.insert(NetflixDialog.local_ed)" class="updateButton button">Insert &raquo;</button>
+
+</body>
+</html>
